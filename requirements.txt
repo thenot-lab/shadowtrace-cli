@@ -1,0 +1,8 @@
+# shadowtrace v7 dependencies
+pyyaml>=6.0       # config
+anthropic>=0.40   # Claude Opus 4.7
+python-dateutil   # timestamp handling
+# Source-specific, install as wired:
+# google-auth       # Gmail MCP alternative
+# requests          # HTTP
+# beautifulsoup4    # HTML parsing

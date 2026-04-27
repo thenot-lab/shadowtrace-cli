@@ -1,0 +1,50 @@
+# shadowtrace v7 config
+# Sole operator: Brayd Gardner. Runs on Legion only.
+
+llm:
+  primary: claude-opus-4-7
+  fallback: gemma4:e4b   # local triage
+  task_budget_default: 8000
+  task_budget_deep: 32000
+
+sources:
+  priority_order:
+    - memory        # highest - free, local
+    - gmail         # consented
+    - stripe_crm    # own customer data
+    - common_room
+    - apollo
+    - github
+    - linkedin_public
+    - web_search    # lowest - slowest, costs tokens
+
+rate_limits:
+  queries_per_hour: 60
+  queries_per_day: 500
+  per_source:
+    web_search: 30/hour
+    apollo: 20/hour
+    common_room: 20/hour
+
+consent:
+  default_tier: public_only
+  eu_subject_auto_detect: true
+  eu_tier: manifestly_public
+  sensitive_category_auto_redact: true
+
+audit:
+  log_path: ./cache/audit.jsonl
+  retention_days: 90
+  include_query_text: true
+  include_source_responses: false
+
+output:
+  profile_path_template: "../knowledge/profiles/{subject_id}.md"
+  cache_path_template: "./cache/{subject_id}.json"
+  format: markdown+json
+
+privacy:
+  scrape_robots_compliant: true
+  require_public_api_or_consent: true
+  single_operator_enforced: true
+  exfil_prohibited: true

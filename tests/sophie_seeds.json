@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Sophie Wilson - Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Sophie_Wilson",
+    "snippet": "Sophie Mary Wilson CBE FRS FREng (born June 1957) is a British computer scientist. She designed the Acorn Micro-Computer instruction set and the BBC BASIC programming language, and co-designed the original ARM architecture with Steve Furber. Wilson works at Broadcom in Cambridge, England.",
+    "source_name": "wikipedia",
+    "confidence": 0.92,
+    "ts": "2024-08-12T10:00:00Z"
+  },
+  {
+    "title": "Sophie Wilson - Royal Society Fellow",
+    "url": "https://royalsociety.org/people/sophie-wilson-12345/",
+    "snippet": "Sophie Wilson was elected a Fellow of the Royal Society (FRS) in 2013 for her contributions to computer science and the co-design of the ARM processor architecture, which now powers the vast majority of smartphones worldwide.",
+    "source_name": "academic",
+    "confidence": 0.95,
+    "ts": "2013-05-02T09:30:00Z"
+  },
+  {
+    "title": "How ARM conquered the world - BBC",
+    "url": "https://www.bbc.co.uk/news/technology-arm-sophie-wilson",
+    "snippet": "Sophie Wilson co-designed the original ARM architecture with Steve Furber at Acorn Computers in Cambridge. The ARM instruction set, first shipped in 1985, is now the most widely used processor architecture in the world, powering over 230 billion chips as of 2024.",
+    "source_name": "news",
+    "confidence": 0.90,
+    "ts": "2024-03-15T14:22:00Z"
+  },
+  {
+    "title": "Sophie Wilson CBE - Royal Academy of Engineering",
+    "url": "https://www.raeng.org.uk/fellows/sophie-wilson",
+    "snippet": "Wilson earned the Fellow of the Royal Academy of Engineering (FREng) designation and was appointed CBE (Commander of the Order of the British Empire) in 2019 for services to computer science. She is also an Honorary Fellow of Selwyn College, Cambridge.",
+    "source_name": "academic",
+    "confidence": 0.93,
+    "ts": "2019-06-12T11:00:00Z"
+  },
+  {
+    "title": "Sophie Wilson - Director of IC Design at Broadcom",
+    "url": "https://www.broadcom.com/company/leadership/sophie-wilson",
+    "snippet": "Wilson currently works at Broadcom Inc. as Director of IC Design in Cambridge, United Kingdom. She joined Broadcom after it acquired Element 14, where she had been working since leaving Acorn Computers.",
+    "source_name": "news",
+    "confidence": 0.85,
+    "ts": "2022-01-10T09:00:00Z"
+  },
+  {
+    "title": "Sophie Wilson - Computer History Museum Fellow",
+    "url": "https://computerhistory.org/fellows/sophie-wilson-2012",
+    "snippet": "Sophie Wilson received the Computer History Museum Fellow Award in 2012 and the Lovie Lifetime Achievement Award in 2014 for her foundational work on the BBC Micro and ARM. She delivered the 2022 Lovelace Lecture at the British Computer Society.",
+    "source_name": "news",
+    "confidence": 0.88,
+    "ts": "2022-10-05T19:00:00Z"
+  },
+  {
+    "title": "Selwyn College Alumni - Sophie Wilson",
+    "url": "https://www.sel.cam.ac.uk/alumni/sophie-wilson",
+    "snippet": "Wilson studied at Selwyn College, Cambridge, from 1975 to 1978, reading Mathematics and Computer Science. She joined Acorn Computers upon graduation and designed the Acorn System 1, Acorn Atom, and BBC Micro before co-designing the ARM architecture with Steve Furber.",
+    "source_name": "academic",
+    "confidence": 0.87,
+    "ts": "2020-09-14T12:00:00Z"
+  },
+  {
+    "title": "BBC BASIC - Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/BBC_BASIC",
+    "snippet": "Sophie Wilson designed the BBC BASIC interpreter in 1981, which shipped on the BBC Microcomputer. The BBC Micro sold over 1.5 million units and was used in schools across the United Kingdom during the 1980s.",
+    "source_name": "wikipedia",
+    "confidence": 0.90,
+    "ts": "2024-02-18T16:45:00Z"
+  }
+]

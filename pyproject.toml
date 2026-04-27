@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shadowtrace"
+version = "7.1.0"
+description = "Single-operator OSINT toolkit. Public sources only. Audit-logged. Cross-validated."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Brayden Gardner", email = "brayd@dominionlabs.dev"}]
+maintainers = [{name = "Dominion Labs", email = "shadowtrace@dominionlabs.dev"}]
+keywords = ["osint", "investigation", "research", "verification", "due-diligence", "ethical-osint"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Legal Industry",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Topic :: Sociology",
+]
+dependencies = [
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "ruff>=0.1.0",
+  "black>=23.0",
+  "build>=1.0",
+]
+llm = [
+  "anthropic>=0.20.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/dominionlabs/shadowtrace"
+Documentation = "https://github.com/dominionlabs/shadowtrace#readme"
+Repository = "https://github.com/dominionlabs/shadowtrace"
+Issues = "https://github.com/dominionlabs/shadowtrace/issues"
+Changelog = "https://github.com/dominionlabs/shadowtrace/blob/main/CHANGELOG.md"
+
+[project.scripts]
+shadowtrace = "shadowtrace.cli:main"
+
+[tool.setuptools]
+packages = ["shadowtrace", "shadowtrace.audit", "shadowtrace.sources", "shadowtrace.synth", "shadowtrace.output", "shadowtrace.tests"]
+
+[tool.setuptools.package-dir]
+"shadowtrace" = "."
+"shadowtrace.audit" = "audit"
+"shadowtrace.sources" = "sources"
+"shadowtrace.synth" = "synth"
+"shadowtrace.output" = "output"
+"shadowtrace.tests" = "tests"
+
+[tool.setuptools.package-data]
+shadowtrace = ["v7_config.yaml"]
+"shadowtrace.tests" = ["*.json"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]  # line length handled by black
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
