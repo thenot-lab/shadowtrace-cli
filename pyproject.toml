@@ -44,11 +44,11 @@ llm = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dominionlabs/shadowtrace"
-Documentation = "https://github.com/dominionlabs/shadowtrace#readme"
-Repository = "https://github.com/dominionlabs/shadowtrace"
-Issues = "https://github.com/dominionlabs/shadowtrace/issues"
-Changelog = "https://github.com/dominionlabs/shadowtrace/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/thenot-lab/shadowtrace-cli"
+Documentation = "https://github.com/thenot-lab/shadowtrace-cli#readme"
+Repository = "https://github.com/thenot-lab/shadowtrace-cli"
+Issues = "https://github.com/thenot-lab/shadowtrace-cli/issues"
+Changelog = "https://github.com/thenot-lab/shadowtrace-cli/blob/main/CHANGELOG.md"
 
 [project.scripts]
 shadowtrace = "shadowtrace.cli:main"

@@ -54,8 +54,11 @@ htmlcov/
 
 # shadowtrace runtime artifacts
 cache/
-output/
 *.audit.jsonl
+# output/ is a source package — runtime files inside it are ignored, .py files are committed
+output/*.json
+output/*.md
+output/__pycache__/
 
 # Local config overrides
 v7_config.local.yaml

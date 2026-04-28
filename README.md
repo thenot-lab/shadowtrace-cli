@@ -2,7 +2,7 @@
 
 **Single-operator OSINT toolkit. Public sources only. Audit-logged. Cross-validated.**
 
-[![CI](https://github.com/dominionlabs/shadowtrace/actions/workflows/ci.yml/badge.svg)](https://github.com/dominionlabs/shadowtrace/actions/workflows/ci.yml)
+[![CI](https://github.com/thenot-lab/shadowtrace-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/thenot-lab/shadowtrace-cli/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
@@ -48,7 +48,7 @@ pip install shadowtrace
 Or from source:
 
 ```bash
-git clone https://github.com/dominionlabs/shadowtrace.git
+git clone https://github.com/thenot-lab/shadowtrace-cli.git
 cd shadowtrace
 pip install -e .
 ```
