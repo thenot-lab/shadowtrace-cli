@@ -3,10 +3,14 @@
 Wraps a shadowtrace research bundle with a durable session ID, checkpoint
 persistence, and a resume() path. Sessions live in cache/sessions/.
 """
+
 from __future__ import annotations
-import json, time, hashlib
+
+import hashlib
+import json
+import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 BASE = Path(__file__).resolve().parent / "cache" / "sessions"
 BASE.mkdir(parents=True, exist_ok=True)
@@ -16,7 +20,7 @@ def _sid(query: str) -> str:
     return f"inv-{hashlib.sha1(query.lower().encode()).hexdigest()[:10]}-{int(time.time())}"
 
 
-def start(query: str, target_info: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def start(query: str, target_info: dict[str, Any] | None = None) -> dict[str, Any]:
     sid = _sid(query)
     state = {
         "session_id": sid,
@@ -33,19 +37,21 @@ def start(query: str, target_info: Dict[str, Any] | None = None) -> Dict[str, An
     return state
 
 
-def checkpoint(session: Dict[str, Any], bundle: Dict[str, Any]) -> None:
+def checkpoint(session: dict[str, Any], bundle: dict[str, Any]) -> None:
     sid = session["session_id"]
     session["last_checkpoint_iso"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    session["findings"].append({
-        "records": bundle["meta"]["record_count"],
-        "corroborated": sum(1 for c in bundle["corroborated_claims"] if c["corroborated"]),
-        "subject_id": bundle["meta"]["subject_id"],
-    })
+    session["findings"].append(
+        {
+            "records": bundle["meta"]["record_count"],
+            "corroborated": sum(1 for c in bundle["corroborated_claims"] if c["corroborated"]),
+            "subject_id": bundle["meta"]["subject_id"],
+        }
+    )
     session["evidence_chains"] = bundle.get("evidence_chains", [])
     (BASE / f"{sid}.json").write_text(json.dumps(session, indent=2), encoding="utf-8")
 
 
-def resume(session_id: str) -> Optional[Dict[str, Any]]:
+def resume(session_id: str) -> dict[str, Any] | None:
     p = BASE / f"{session_id}.json"
     if not p.exists():
         return None

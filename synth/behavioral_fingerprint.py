@@ -7,10 +7,14 @@ often identify them more reliably than WHAT they write. We extract:
   - temporal: posting-time distribution (when timestamps available)
   - platform affinity: which sources over-index on this subject
 """
+
 from __future__ import annotations
-import re, statistics
+
+import re
+import statistics
 from collections import Counter
-from typing import List, Dict, Any
+from typing import Any
+
 from ..sources.base import Record
 
 HEDGES = ("might", "perhaps", "possibly", "arguably", "reportedly", "seems", "appears")
@@ -18,13 +22,13 @@ INTENSIFIERS = ("very", "extremely", "absolutely", "clearly", "obviously", "defi
 OPENERS = ("I ", "We ", "The ", "This ", "That ", "In ", "On ", "At ", "When ", "If ")
 
 
-def _split_sentences(text: str) -> List[str]:
+def _split_sentences(text: str) -> list[str]:
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
 
 
-def _timestamps(records: List[Record]) -> List[str]:
+def _timestamps(records: list[Record]) -> list[str]:
     """Pull ISO-like timestamps from record metadata."""
-    out: List[str] = []
+    out: list[str] = []
     for r in records:
         t = r.meta.get("timestamp") or r.meta.get("published") or r.meta.get("created_at")
         if t and isinstance(t, str):
@@ -37,7 +41,7 @@ def _hour_from_iso(iso: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
-def fingerprint(records: List[Record]) -> Dict[str, Any]:
+def fingerprint(records: list[Record]) -> dict[str, Any]:
     all_text = "\n\n".join(r.content for r in records if r.content)
     if not all_text.strip():
         return {"insufficient_data": True, "sample_size": 0}
@@ -65,7 +69,7 @@ def fingerprint(records: List[Record]) -> Dict[str, Any]:
                 break
 
     hours = [h for h in (_hour_from_iso(t) for t in _timestamps(records)) if h is not None]
-    hour_hist: Dict[int, int] = {}
+    hour_hist: dict[int, int] = {}
     for h in hours:
         hour_hist[h] = hour_hist.get(h, 0) + 1
 

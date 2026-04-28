@@ -21,9 +21,12 @@ co-designer of the BBC Micro and the ARM processor architecture. Rationale:
   - ARM is foundational to modern computing -> high-authority cross-refs
   - NOT a private individual, not a minor, not a protected class subject
 """
+
 from __future__ import annotations
+
 import json
 from pathlib import Path
+
 from shadowtrace import engine
 from shadowtrace import session as _session
 
@@ -52,7 +55,11 @@ def run() -> dict:
         results["assertions"].append({"name": name, "pass": bool(cond), "detail": detail})
 
     _assert("version_is_7_1", meta.get("version") == "7.1.0", f"got={meta.get('version')}")
-    _assert("session_id_present", bool(meta.get("session_id", "").startswith("inv-")), meta.get("session_id", ""))
+    _assert(
+        "session_id_present",
+        bool(meta.get("session_id", "").startswith("inv-")),
+        meta.get("session_id", ""),
+    )
     _assert("records_gathered", meta["record_count"] >= 3, f"records={meta['record_count']}")
     _assert("multi_source", len(meta["sources_hit"]) >= 2, f"sources={meta['sources_hit']}")
     _assert("clusters_built", meta["cluster_count"] >= 1, f"clusters={meta['cluster_count']}")
@@ -71,7 +78,9 @@ def run() -> dict:
 
     fp = profile.get("fingerprint", {})
     if not fp.get("insufficient_data"):
-        _assert("fingerprint_word_count", fp.get("word_count", 0) > 20, f"wc={fp.get('word_count')}")
+        _assert(
+            "fingerprint_word_count", fp.get("word_count", 0) > 20, f"wc={fp.get('word_count')}"
+        )
         _assert("fingerprint_lexical", "lexical" in fp)
         _assert("fingerprint_platform_affinity", "platform_affinity" in fp)
 
@@ -80,8 +89,12 @@ def run() -> dict:
     _assert("session_has_checkpoint", sess is not None and len(sess.get("findings", [])) >= 1)
 
     refined = profile["top_orgs_refined"]
-    bad_stopwords = [o for o in refined if o["name"].lower().strip(".") in ("news", "politics", "business")]
-    _assert("no_stopword_orgs", len(bad_stopwords) == 0, f"bad={[o['name'] for o in bad_stopwords]}")
+    bad_stopwords = [
+        o for o in refined if o["name"].lower().strip(".") in ("news", "politics", "business")
+    ]
+    _assert(
+        "no_stopword_orgs", len(bad_stopwords) == 0, f"bad={[o['name'] for o in bad_stopwords]}"
+    )
 
     passed = sum(1 for a in results["assertions"] if a["pass"])
     total = len(results["assertions"])

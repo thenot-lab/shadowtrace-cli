@@ -5,10 +5,11 @@ Master-investigator techniques:
   2. Red-team from subject's view: what would they want hidden? flag if absent.
   3. Negative-space analysis: what's NOT present that should be?
 """
-from __future__ import annotations
-import re
-from typing import List, Dict, Any
 
+from __future__ import annotations
+
+import re
+from typing import Any
 
 SHOULD_EXIST = {
     "public_executive": ["wikipedia_presence", "news_coverage", "company_affiliation"],
@@ -18,7 +19,7 @@ SHOULD_EXIST = {
 }
 
 
-def counter_hypothesize(claim: str) -> List[str]:
+def counter_hypothesize(claim: str) -> list[str]:
     """Given a claim, generate contradicting hypotheses to search for."""
     low = claim.lower()
     out: list[str] = []
@@ -36,14 +37,18 @@ def counter_hypothesize(claim: str) -> List[str]:
     return out
 
 
-def negative_space(profile: Dict[str, Any], claims: List[Dict[str, Any]], source_types_seen: set) -> Dict[str, Any]:
+def negative_space(
+    profile: dict[str, Any], claims: list[dict[str, Any]], source_types_seen: set
+) -> dict[str, Any]:
     """What's missing that should be present for this subject archetype."""
     archetype = _guess_archetype(profile, claims)
     expected = SHOULD_EXIST.get(archetype, SHOULD_EXIST["general"])
     gaps: list[str] = []
     have_wiki = "wikipedia" in source_types_seen
     have_gh = "github" in source_types_seen
-    have_news = any("news" in s for s in source_types_seen) or any("news" in (c.get("claim","").lower()) for c in claims)
+    have_news = any("news" in s for s in source_types_seen) or any(
+        "news" in (c.get("claim", "").lower()) for c in claims
+    )
 
     if "wikipedia_presence" in expected and not have_wiki:
         gaps.append("No Wikipedia article surfaced for a subject archetype that usually has one.")
@@ -64,7 +69,7 @@ def negative_space(profile: Dict[str, Any], claims: List[Dict[str, Any]], source
     }
 
 
-def _guess_archetype(profile: Dict[str, Any], claims: List[Dict[str, Any]]) -> str:
+def _guess_archetype(profile: dict[str, Any], claims: list[dict[str, Any]]) -> str:
     blob = " ".join([c.get("claim", "") for c in claims]).lower()
     blob += " " + " ".join(t for t, _ in profile.get("top_titles", []))
     if any(w in blob for w in ("ceo", "founder", "president", "executive")):
@@ -84,13 +89,15 @@ def _interpret(gaps: list[str]) -> str:
     return "Minor gaps - consider one more search pass on the missing surfaces before closing."
 
 
-def red_team(profile: Dict[str, Any]) -> List[str]:
+def red_team(profile: dict[str, Any]) -> list[str]:
     """What would the subject want hidden that we should look for?"""
     out: list[str] = []
     if profile.get("top_orgs"):
         out.append("Prior employers during gap years - check LinkedIn-class sources.")
     if profile.get("top_titles"):
-        out.append("Title inflation - cross-check with authoritative filings (SEC, company registry).")
+        out.append(
+            "Title inflation - cross-check with authoritative filings (SEC, company registry)."
+        )
     out.append("Address-of-record vs claimed location - public voter / property records.")
     out.append("Litigation or regulatory actions - court record and regulator databases.")
     out.append("Alternate handles / spellings - typosquat variants, prior names.")

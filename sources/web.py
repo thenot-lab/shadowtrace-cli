@@ -3,13 +3,15 @@
 Used for generic URL fetches the resolver / seed stage points at.
 Respects robots.txt, times out at 10s, UA identifies the tool.
 """
+
 from __future__ import annotations
-import urllib.request
-import urllib.parse
-import urllib.robotparser
-import re
+
 import html
-from typing import List
+import re
+import urllib.parse
+import urllib.request
+import urllib.robotparser
+
 from .base import Record
 
 UA = "shadowtrace/7.0 (+personal OSINT; solo-operator; contact=brayd@dominionlabs)"
@@ -39,7 +41,9 @@ def fetch(url: str) -> str | None:
     if not _robots_ok(url):
         return None
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xhtml+xml"})
+        req = urllib.request.Request(
+            url, headers={"User-Agent": UA, "Accept": "text/html,application/xhtml+xml"}
+        )
         with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
             raw = r.read(2_000_000)
             try:
@@ -64,7 +68,7 @@ def strip_html(s: str) -> str:
     return _WS.sub(" ", s).strip()
 
 
-def harvest(url: str, subject_hint: str, authority: float = 0.4) -> List[Record]:
+def harvest(url: str, subject_hint: str, authority: float = 0.4) -> list[Record]:
     body = fetch(url)
     if not body:
         return []
@@ -72,13 +76,15 @@ def harvest(url: str, subject_hint: str, authority: float = 0.4) -> List[Record]
     if not text:
         return []
     snippet = text[:1800]
-    return [Record(
-        source="web",
-        kind="page",
-        subject_hint=subject_hint,
-        content=snippet,
-        url=url,
-        authority=authority,
-        confidence=0.55,
-        meta={"byte_len": len(body), "text_len": len(text)},
-    )]
+    return [
+        Record(
+            source="web",
+            kind="page",
+            subject_hint=subject_hint,
+            content=snippet,
+            url=url,
+            authority=authority,
+            confidence=0.55,
+            meta={"byte_len": len(body), "text_len": len(text)},
+        )
+    ]

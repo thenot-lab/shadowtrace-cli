@@ -6,19 +6,22 @@ Two-stage:
 
 Output: list of clusters, each with canonical_key, confidence, member records.
 """
-from __future__ import annotations
-import re, hashlib
-from typing import List, Dict, Any
-from difflib import SequenceMatcher
-from ..sources.base import Record
 
+from __future__ import annotations
+
+import hashlib
+import re
+from difflib import SequenceMatcher
+from typing import Any
+
+from ..sources.base import Record
 
 EMAIL = re.compile(r"[\w.\-+]+@[\w\-]+\.[\w\-.]+")
 HANDLE = re.compile(r"(?:^|\s|/)@?([a-zA-Z0-9][a-zA-Z0-9\-_]{1,38})")
 URL_DOMAIN = re.compile(r"https?://(?:www\.)?([^/\s]+)")
 
 
-def _extract_ids(r: Record) -> Dict[str, set]:
+def _extract_ids(r: Record) -> dict[str, set]:
     blob = f"{r.subject_hint}\n{r.content}\n{r.url or ''}\n{r.meta}"
     return {
         "emails": set(m.group(0).lower() for m in EMAIL.finditer(blob)),
@@ -31,7 +34,7 @@ def _name_sim(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
 
-def resolve(records: List[Record], primary_query: str) -> List[Dict[str, Any]]:
+def resolve(records: list[Record], primary_query: str) -> list[dict[str, Any]]:
     clusters: list[dict] = []
     for r in records:
         ids = _extract_ids(r)
@@ -39,21 +42,28 @@ def resolve(records: List[Record], primary_query: str) -> List[Dict[str, Any]]:
         matched = None
         for c in clusters:
             if ids["emails"] & c["ids"]["emails"]:
-                matched = c; break
+                matched = c
+                break
             gh_login = r.meta.get("login")
             if gh_login and gh_login.lower() in c["ids"]["handles"]:
-                matched = c; break
+                matched = c
+                break
             # name similarity > 0.85 and overlapping domain
             if _name_sim(primary_query, r.subject_hint) > 0.5:
-                if _name_sim(c["canonical_name"], r.subject_hint) > 0.8 or (ids["domains"] & c["ids"]["domains"]):
-                    matched = c; break
+                if _name_sim(c["canonical_name"], r.subject_hint) > 0.8 or (
+                    ids["domains"] & c["ids"]["domains"]
+                ):
+                    matched = c
+                    break
         if matched is None:
-            clusters.append({
-                "cluster_id": hashlib.sha1(r.subject_hint.encode()).hexdigest()[:10],
-                "canonical_name": r.subject_hint,
-                "ids": {k: set(v) for k, v in ids.items()},
-                "records": [r],
-            })
+            clusters.append(
+                {
+                    "cluster_id": hashlib.sha1(r.subject_hint.encode()).hexdigest()[:10],
+                    "canonical_name": r.subject_hint,
+                    "ids": {k: set(v) for k, v in ids.items()},
+                    "records": [r],
+                }
+            )
         else:
             for k, v in ids.items():
                 matched["ids"][k] |= v

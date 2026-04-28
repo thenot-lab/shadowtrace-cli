@@ -4,17 +4,22 @@ If an ANTHROPIC_API_KEY is present in env, deep synthesis can upgrade to
 Claude Opus 4.7 with Task Budgets (future). Default path is fully local:
 no LLM dependency, deterministic, auditable.
 """
-from __future__ import annotations
-import re, os
-from collections import Counter
-from typing import List, Dict, Any
-from ..sources.base import Record
 
+from __future__ import annotations
+
+import os
+import re
+from collections import Counter
+from typing import Any
+
+from ..sources.base import Record
 
 TITLES = re.compile(
     r"\b(CEO|CTO|CFO|COO|Founder|Co-founder|President|Director|Manager|Lead|Head|VP|Senior|Principal|Engineer|Researcher|Scientist|Analyst|Journalist|Editor|Professor|PhD|Author|Investigator)\b"
 )
-ORG_HINTS = re.compile(r"\b(?:at|of|@)\s+([A-Z][A-Za-z0-9&\- ]{2,40}?)(?=[.,;!?\n]|\s+(?:and|for|in|on|the|which|where|who|that|he|she|they|a |an )|$)")
+ORG_HINTS = re.compile(
+    r"\b(?:at|of|@)\s+([A-Z][A-Za-z0-9&\- ]{2,40}?)(?=[.,;!?\n]|\s+(?:and|for|in|on|the|which|where|who|that|he|she|they|a |an )|$)"
+)
 YEAR = re.compile(r"\b(19|20)\d{2}\b")
 LOCATION_HINTS = re.compile(r"\b(?:based in|lives in|from|located in)\s+([A-Z][A-Za-z ,.\-]{2,40})")
 
@@ -23,7 +28,7 @@ def _pick_top(items: list[str], n: int = 5) -> list[tuple[str, int]]:
     return Counter(items).most_common(n)
 
 
-def assemble(records: List[Record], subject_query: str) -> Dict[str, Any]:
+def assemble(records: list[Record], subject_query: str) -> dict[str, Any]:
     titles: list[str] = []
     orgs: list[str] = []
     years: list[str] = []
@@ -77,20 +82,28 @@ def assemble(records: List[Record], subject_query: str) -> Dict[str, Any]:
     }
 
 
-def interaction_guide(profile: Dict[str, Any], tier: str) -> List[str]:
+def interaction_guide(profile: dict[str, Any], tier: str) -> list[str]:
     """Recommendations for engagement, tier-gated."""
     out: list[str] = []
     if profile["top_titles"]:
         top = profile["top_titles"][0][0]
-        out.append(f"Lead title is {top}: frame first contact around peer-level value, not introduction.")
+        out.append(
+            f"Lead title is {top}: frame first contact around peer-level value, not introduction."
+        )
     if profile["top_orgs"]:
         org = profile["top_orgs"][0][0]
-        out.append(f"Primary affiliation appears to be {org}: reference their current work, not past.")
+        out.append(
+            f"Primary affiliation appears to be {org}: reference their current work, not past."
+        )
     if profile["top_locations"]:
         loc = profile["top_locations"][0][0]
         out.append(f"Timezone / region hint: {loc}. Send outreach in their business hours.")
     if tier == "manifestly_public":
-        out.append("EU subject: GDPR manifestly-public tier - no sensitive categories in outbound messaging.")
+        out.append(
+            "EU subject: GDPR manifestly-public tier - no sensitive categories in outbound messaging."
+        )
     if not profile["top_orgs"] and not profile["top_titles"]:
-        out.append("Sparse signal: request explicit intro or warm connection before direct outreach.")
+        out.append(
+            "Sparse signal: request explicit intro or warm connection before direct outreach."
+        )
     return out

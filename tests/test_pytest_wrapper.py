@@ -4,10 +4,10 @@ The fixture in test_v7_1_sophie.py exposes a `run()` function that returns
 an assertion report. This wrapper makes CI pick it up by exposing each
 assertion as its own pytest test, so failures surface individually.
 """
+
 from __future__ import annotations
 
 import pytest
-
 from shadowtrace.tests.test_v7_1_sophie import run as _run
 
 

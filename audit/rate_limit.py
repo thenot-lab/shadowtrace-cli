@@ -2,15 +2,17 @@
 
 Enforces global + per-source throttles from v7_config.yaml.
 """
+
 from __future__ import annotations
-import json, time
+
+import json
+import time
 from pathlib import Path
-from typing import Dict
 
 STATE_PATH = Path(__file__).resolve().parent.parent / "cache" / "rate_state.json"
 
 
-def _load() -> Dict:
+def _load() -> dict:
     if STATE_PATH.exists():
         try:
             return json.loads(STATE_PATH.read_text(encoding="utf-8"))
@@ -19,7 +21,7 @@ def _load() -> Dict:
     return {"windows": {}}
 
 
-def _save(state: Dict) -> None:
+def _save(state: dict) -> None:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     STATE_PATH.write_text(json.dumps(state, indent=2), encoding="utf-8")
 
@@ -54,5 +56,5 @@ def commit(source: str) -> None:
     _save(state)
 
 
-def status() -> Dict:
+def status() -> dict:
     return _load()

@@ -6,9 +6,9 @@ filter strips any record whose URL or source-path lies inside the
 shadowtrace cache or profiles tree, and any record whose content matches
 the shadowtrace report signature.
 """
+
 from __future__ import annotations
-from pathlib import Path
-from typing import List
+
 from ..sources.base import Record
 
 SIGNATURES = (
@@ -19,7 +19,12 @@ SIGNATURES = (
     "subject_id:",
 )
 
-BAD_PATH_PARTS = ("shadowtrace/cache", "eli/knowledge/profiles", "shadowtrace\\cache", "eli\\knowledge\\profiles")
+BAD_PATH_PARTS = (
+    "shadowtrace/cache",
+    "eli/knowledge/profiles",
+    "shadowtrace\\cache",
+    "eli\\knowledge\\profiles",
+)
 
 
 def _looks_like_self(content: str) -> bool:
@@ -30,9 +35,9 @@ def _looks_like_self(content: str) -> bool:
     return hits >= 2
 
 
-def filter_records(records: List[Record]) -> tuple[List[Record], int]:
+def filter_records(records: list[Record]) -> tuple[list[Record], int]:
     """Return (kept, dropped_count)."""
-    kept: List[Record] = []
+    kept: list[Record] = []
     dropped = 0
     for r in records:
         url = (r.url or "").lower().replace("\\", "/")

@@ -1,7 +1,8 @@
 """Drop the human report into eli/knowledge/profiles/ for next-session recall."""
-from __future__ import annotations
-from pathlib import Path
 
+from __future__ import annotations
+
+from pathlib import Path
 
 KNOWLEDGE_PROFILES = Path(__file__).resolve().parent.parent.parent / "knowledge" / "profiles"
 

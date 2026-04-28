@@ -5,32 +5,128 @@ Defect #2 from v7.0.1: rule-based org extractor listed common nouns like
 module normalizes, filters stopword-orgs, collapses prefix substrings,
 and scores by frequency + title-case ratio.
 """
+
 from __future__ import annotations
+
 import re
-from typing import List, Dict
 
 # words that are frequently miscapitalized as Title Case but aren't orgs
 STOPWORD_ORGS = {
-    "news", "politics", "business", "sports", "technology", "tech", "science",
-    "health", "media", "opinion", "world", "national", "local", "breaking",
-    "the", "a", "an", "he", "she", "they", "his", "her", "their", "this",
-    "that", "these", "those", "also", "since", "when", "where", "who", "how",
-    "today", "yesterday", "tomorrow", "january", "february", "march", "april",
-    "may", "june", "july", "august", "september", "october", "november",
-    "december", "monday", "tuesday", "wednesday", "thursday", "friday",
-    "saturday", "sunday", "english", "french", "spanish", "german", "italian",
-    "best-seller", "bestseller", "interview", "article", "book", "page",
+    "news",
+    "politics",
+    "business",
+    "sports",
+    "technology",
+    "tech",
+    "science",
+    "health",
+    "media",
+    "opinion",
+    "world",
+    "national",
+    "local",
+    "breaking",
+    "the",
+    "a",
+    "an",
+    "he",
+    "she",
+    "they",
+    "his",
+    "her",
+    "their",
+    "this",
+    "that",
+    "these",
+    "those",
+    "also",
+    "since",
+    "when",
+    "where",
+    "who",
+    "how",
+    "today",
+    "yesterday",
+    "tomorrow",
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+    "english",
+    "french",
+    "spanish",
+    "german",
+    "italian",
+    "best-seller",
+    "bestseller",
+    "interview",
+    "article",
+    "book",
+    "page",
 }
 
 # suffixes that strongly indicate real orgs
 ORG_SUFFIXES = (
-    "inc", "inc.", "ltd", "ltd.", "llc", "corp", "corp.", "co.", "co",
-    "university", "college", "institute", "foundation", "center", "centre",
-    "group", "labs", "lab", "studios", "studio", "agency", "school",
-    "hospital", "academy", "press", "publishing", "society", "association",
-    "council", "board", "committee", "department", "ministry", "bureau",
-    "agency", "commission", "organization", "organisation", "alliance",
-    "network", "federation", "union", "league", "club", "bellingcat",
+    "inc",
+    "inc.",
+    "ltd",
+    "ltd.",
+    "llc",
+    "corp",
+    "corp.",
+    "co.",
+    "co",
+    "university",
+    "college",
+    "institute",
+    "foundation",
+    "center",
+    "centre",
+    "group",
+    "labs",
+    "lab",
+    "studios",
+    "studio",
+    "agency",
+    "school",
+    "hospital",
+    "academy",
+    "press",
+    "publishing",
+    "society",
+    "association",
+    "council",
+    "board",
+    "committee",
+    "department",
+    "ministry",
+    "bureau",
+    "agency",
+    "commission",
+    "organization",
+    "organisation",
+    "alliance",
+    "network",
+    "federation",
+    "union",
+    "league",
+    "club",
+    "bellingcat",
 )
 
 
@@ -38,18 +134,18 @@ def _is_stopword(tok: str) -> bool:
     return tok.lower().strip(".,;:()[]") in STOPWORD_ORGS
 
 
-def _split_into_clause_orgs(phrase: str) -> List[str]:
+def _split_into_clause_orgs(phrase: str) -> list[str]:
     """Split a multi-clause extraction into the shortest org-looking prefix."""
     # Heuristic: if phrase contains "He "/"She "/"They "/"It "/"Since " mid-phrase, cut before it
     m = re.search(r"\.\s+(He|She|They|It|Since|When|Because|However|After|Before|During)\b", phrase)
     if m:
-        phrase = phrase[:m.start()]
+        phrase = phrase[: m.start()]
     return [phrase.strip(" .,;:")]
 
 
-def normalize_orgs(raw_orgs: List[str]) -> List[Dict[str, object]]:
+def normalize_orgs(raw_orgs: list[str]) -> list[dict[str, object]]:
     """Return sorted list of {name, score, count} with junk filtered."""
-    freq: Dict[str, int] = {}
+    freq: dict[str, int] = {}
     for org in raw_orgs:
         for piece in _split_into_clause_orgs(org):
             piece = re.sub(r"\s+", " ", piece).strip(" .,;:\u2014-")
@@ -69,10 +165,8 @@ def normalize_orgs(raw_orgs: List[str]) -> List[Dict[str, object]]:
 
     # collapse prefix substrings: if "Bellingcat" and "Bellingcat Investigations" both present, keep both but prefer longer-root
     items = sorted(freq.items(), key=lambda kv: (-kv[1], -len(kv[0])))
-    seen_roots: set[str] = set()
-    out: List[Dict[str, object]] = []
+    out: list[dict[str, object]] = []
     for name, count in items:
-        root = name.split()[0].lower()
         # bonus if matches known org suffix pattern
         last_tok = name.split()[-1].lower().strip(".")
         suffix_bonus = 0.15 if last_tok in ORG_SUFFIXES else 0.0

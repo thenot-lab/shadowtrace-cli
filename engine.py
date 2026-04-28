@@ -9,28 +9,40 @@ v7.1 upgrades over v7.0.1:
   - investigation session with checkpoint + resume
   - span-based telemetry alongside audit log
 """
-from __future__ import annotations
-import hashlib, time, yaml
-from pathlib import Path
-from typing import Any, Dict, List
 
-from .audit import rate_limit, source_log, consent_check, telemetry
-from .sources import base as _base
-from .sources import web, github, wikipedia, memory, seed, mcp_stub
-from .synth import resolver, cross_validate, behavioral, adversarial
-from .synth import self_ref_filter, semantic_dedup, behavioral_fingerprint
-from .synth import pivot_chains, evidence_chain
-from .output import report as _report
-from .output import json_export
-from .output import update_knowledge
+from __future__ import annotations
+
+import hashlib
+import time
+from pathlib import Path
+from typing import Any
+
+import yaml
+
 from . import session as _session
+from .audit import consent_check, rate_limit, source_log, telemetry
+from .output import json_export, update_knowledge
+from .output import report as _report
+from .sources import base as _base
+from .sources import github, mcp_stub, memory, seed, web, wikipedia
+from .synth import (
+    adversarial,
+    behavioral,
+    behavioral_fingerprint,
+    cross_validate,
+    evidence_chain,
+    pivot_chains,
+    resolver,
+    self_ref_filter,
+    semantic_dedup,
+)
 
 BASE = Path(__file__).resolve().parent
 CACHE = BASE / "cache"
 VERSION = "7.1.0"
 
 
-def _load_cfg() -> Dict[str, Any]:
+def _load_cfg() -> dict[str, Any]:
     p = BASE / "v7_config.yaml"
     if not p.exists():
         return {}
@@ -44,13 +56,18 @@ def _subject_id(query: str) -> str:
     return hashlib.sha1(query.strip().lower().encode()).hexdigest()[:12]
 
 
-def research(query: str, seeds_path: str | None = None,
-             enable_web: bool = True, enable_github: bool = True,
-             enable_wikipedia: bool = True, enable_memory: bool = True,
-             urls_to_fetch: List[str] | None = None,
-             explicit_consent: bool = False,
-             session_resume_id: str | None = None,
-             pivot_depth: int = 1) -> Dict[str, Any]:
+def research(
+    query: str,
+    seeds_path: str | None = None,
+    enable_web: bool = True,
+    enable_github: bool = True,
+    enable_wikipedia: bool = True,
+    enable_memory: bool = True,
+    urls_to_fetch: list[str] | None = None,
+    explicit_consent: bool = False,
+    session_resume_id: str | None = None,
+    pivot_depth: int = 1,
+) -> dict[str, Any]:
     run_span = telemetry.span("research.full", query=query[:80], version=VERSION)
     cfg = _load_cfg()
     cfg.setdefault("consent", {})["explicit"] = explicit_consent
@@ -66,9 +83,8 @@ def research(query: str, seeds_path: str | None = None,
     else:
         sess = _session.start(query, {"subject_id": subject_id})
 
-    records: List[_base.Record] = []
+    records: list[_base.Record] = []
     sources_hit: set[str] = set()
-    limits = cfg.get("rate_limits", {}).get("per_source", {})
 
     def _call(name: str, spec: str, fn, *args):
         s = telemetry.span("source." + name)
@@ -124,9 +140,11 @@ def research(query: str, seeds_path: str | None = None,
 
     # re-evaluate consent tier against record content for EU/UK detection
     try:
-        _combined = query + chr(10) + chr(10).join((r.content or '')[:400] for r in records[:20])
+        _combined = query + chr(10) + chr(10).join((r.content or "")[:400] for r in records[:20])
         _promoted = consent_check.evaluate(_combined, cfg)
-        if isinstance(_promoted, dict) and (_promoted.get('tier') != 'public_only' or _promoted.get('eu_subject')):
+        if isinstance(_promoted, dict) and (
+            _promoted.get("tier") != "public_only" or _promoted.get("eu_subject")
+        ):
             consent = _promoted
     except Exception:
         pass
@@ -147,12 +165,17 @@ def research(query: str, seeds_path: str | None = None,
     cv_span = telemetry.span("synth.cross_validate")
     claims = cross_validate.extract_claims(primary_cluster_records)
     corroborated = cross_validate.corroborate(claims)
-    cv_span.add_event("validated", {"claims": len(claims), "corroborated": sum(1 for c in corroborated if c["corroborated"])})
+    cv_span.add_event(
+        "validated",
+        {"claims": len(claims), "corroborated": sum(1 for c in corroborated if c["corroborated"])},
+    )
     cv_span.end("ok")
 
     profile_span = telemetry.span("synth.profile")
     profile = behavioral.assemble(primary_cluster_records, query)
-    raw_org_names = [o[0] if isinstance(o, (list, tuple)) else o for o in profile.get("top_orgs", [])]
+    raw_org_names = [
+        o[0] if isinstance(o, (list, tuple)) else o for o in profile.get("top_orgs", [])
+    ]
     profile["top_orgs_refined"] = semantic_dedup.normalize_orgs(raw_org_names)
     profile["fingerprint"] = behavioral_fingerprint.fingerprint(primary_cluster_records)
     guide = behavioral.interaction_guide(profile, consent["tier"])
@@ -167,7 +190,9 @@ def research(query: str, seeds_path: str | None = None,
     rt = adversarial.red_team(profile)
     counter = []
     for cl in [c for c in corroborated if c["corroborated"]][:6]:
-        counter.append({"claim": cl["claim"], "hypotheses": adversarial.counter_hypothesize(cl["claim"])})
+        counter.append(
+            {"claim": cl["claim"], "hypotheses": adversarial.counter_hypothesize(cl["claim"])}
+        )
     adv_span.end("ok")
 
     chain_span = telemetry.span("synth.evidence_chain")
@@ -177,11 +202,13 @@ def research(query: str, seeds_path: str | None = None,
 
     pivot_span = telemetry.span("synth.pivot_chains")
     confirmed_orgs = [o["name"] for o in profile["top_orgs_refined"][:5]]
-    pivots = pivot_chains.propose_pivots(query, primary_cluster_records, confirmed_orgs, depth=pivot_depth)
+    pivots = pivot_chains.propose_pivots(
+        query, primary_cluster_records, confirmed_orgs, depth=pivot_depth
+    )
     pivot_span.add_event("pivots", {"count": len(pivots)})
     pivot_span.end("ok")
 
-    bundle: Dict[str, Any] = {
+    bundle: dict[str, Any] = {
         "subject_query": query,
         "meta": {
             "version": VERSION,
@@ -233,6 +260,13 @@ def research(query: str, seeds_path: str | None = None,
     }
 
     _session.checkpoint(sess, bundle)
-    run_span.add_event("complete", {"records": len(records), "corroborated": sum(1 for c in corroborated if c["corroborated"]), "chains": len(chains)})
+    run_span.add_event(
+        "complete",
+        {
+            "records": len(records),
+            "corroborated": sum(1 for c in corroborated if c["corroborated"]),
+            "chains": len(chains),
+        },
+    )
     run_span.end("ok")
     return bundle
